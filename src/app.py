@@ -28,38 +28,37 @@ def sitemap():
 @app.route('/members', methods=['GET'])
 def get_all_members():
     members = jackson_family.get_all_members()
-    response_body = (
-        members
-    )
-    return jsonify(response_body), 200
+    return jsonify(members), 200
 
 @app.route('/member/<int:id>', methods=['GET'])
 def get_member(id):
     member = jackson_family.get_member(id)
     if member is not None:
-        return jsonify({
-            "id":member["id"],
-            "first_name":member["first_name"],
-            "last_name":jackson_family.last_name,
-            "age":member["age"],
-            "lucky_numbers":member["lucky_numbers"]
-        }), 200
+        return jsonify(member), 200
     else:
         return "No se encontró ningún miembro con el ID proporcionado", 404
 
 @app.route('/member', methods=['POST'])
-def post_member(id):    
+def post_member():    
     body = request.get_json()
     if 'first_name' not in body or 'age' not in body or 'lucky_numbers' not in body:
-        return jsonify({'error': 'Se requieren todos los campos: id, first_name, age, lucky_numbers'}), 400
+        return jsonify({'error': 'Se requieren todos los campos: first_name, age, lucky_numbers'}), 400
     new_member = {
-        'id': body['id'],
         'first_name': body['first_name'],
         'age': body['age'],
         'lucky_numbers': body['lucky_numbers']
     }
+    jackson_family.add_member(new_member)
 
-    return jsonify(new_member), 200
+    return jsonify({"message": "Miembro agregado correctamente"}), 200
+
+@app.route('/member/<int:id>', methods=['DELETE'])
+def delete_member(id):
+    deleted = jackson_family.delete_member(id)
+    if deleted:
+        return jsonify({"done": True}), 200 
+    else:
+        return jsonify({"error": "Miembro no encontrado"}), 404  
 
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
