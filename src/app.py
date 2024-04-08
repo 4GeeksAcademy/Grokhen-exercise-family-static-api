@@ -34,7 +34,13 @@ def get_all_members():
 def get_member(id):
     member = jackson_family.get_member(id)
     if member is not None:
-        return jsonify(member), 200
+        return jsonify({
+            "id":member["id"],
+            "first_name":member["first_name"],
+            "last_name":jackson_family.last_name,
+            "age":member["age"],
+            "lucky_numbers":member["lucky_numbers"]
+        }), 200
     else:
         return "No se encontró ningún miembro con el ID proporcionado", 404
 
@@ -44,6 +50,7 @@ def post_member():
     if 'first_name' not in body or 'age' not in body or 'lucky_numbers' not in body:
         return jsonify({'error': 'Se requieren todos los campos: first_name, age, lucky_numbers'}), 400
     new_member = {
+        'id': body['id'],
         'first_name': body['first_name'],
         'age': body['age'],
         'lucky_numbers': body['lucky_numbers']
